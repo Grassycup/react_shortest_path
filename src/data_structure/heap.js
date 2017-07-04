@@ -23,7 +23,7 @@ class Heap {
   heapify() {
     let list = this.list;
     let end = list.length -1;
-    while(end > 0) {
+    while(end >= 0) {
       this.swap(0, end);
       this.siftDown(0);
       end--;
