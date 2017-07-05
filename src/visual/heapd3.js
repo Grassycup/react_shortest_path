@@ -1,265 +1,108 @@
 import React, { Component } from 'react';
 import './heapd3.css';
 import Heap from '../data_structure/heap.js';
-import * as d3 from 'd3';
+import cytoscape from 'cytoscape';
+import dagre from 'cytoscape-dagre';
+dagre(cytoscape);
 
 class Heapd3 extends React.Component {
   componentDidMount() {
-    this.drawChart();
+    var beforeList = [6, 5, 3, 2, 1, 4,5,5,5,5,5,5,4,6,6,2,3,36,35,2,21,5,8,74,5,4,9,0,8,8,6,7];
+    var beforeData = this.listToObj(beforeList, 'a');
+    var heap = new Heap(beforeList);
+    var afterData = this.listToObj(heap.list, 'b');
+
+    this.drawChart('beforeHeap', beforeData);
+    this.drawChart('afterHeap', afterData);
   }
 
   shouldComponentUpdate() {
     return false;
   }
 
-  listToObj(list) {
-    let root = {
-      name: 'empty',
-      children: []
+  createNode(id, value, prefix = '') {
+    return {
+      data: {
+        id: prefix + 'node' + id,
+        value: value
+      }
     };
-    if(!list){
-      return root;
-    }
-    let current = null;
-    let nodes = [ root ];
-    for(let i = 0; i < list.length; i++) {
-      current = nodes[i];
-      current.name = list[i];
-      if(2*i+1 < list.length) {
-        let leftChild = {
-          name: null,
-          children: []
-        };
-        current.children.push(leftChild);
-        nodes.push(leftChild);
-      }
-      if(2*i+2 < list.length) {
-        let rightChild = {
-          name: null,
-          children: []
-        };
-        current.children.push(rightChild);
-        nodes.push(rightChild);
-      }
-    }
-    return root;
   }
 
-  drawChart() {
-    var beforeList = [6, 5, 3, 2, 1, 4,5,5,5,5,5,5,4,6,6,2,3,36,35,2,21,5,8,74,5,4,9,0,8,8,6,7];
-    var beforeData = this.listToObj(beforeList);
-    var heap = new Heap(beforeList);
-    var afterData = this.listToObj(heap.list);
-    console.log(heap.list);
-console.log(afterData);
-
-// Set the dimensions and margins of the diagram
-//     var margin = {top: 20, right: 90, bottom: 30, left: 90},
-//       width = 960 - margin.left - margin.right,
-//       height = 500 - margin.top - margin.bottom;
-
-// append the svg object to the body of the page
-// appends a 'group' element to 'svg'
-// moves the 'group' element to the top left margin
-    var width = (d3.select('.svg-container').node().getBoundingClientRect().width) / -4;
-    var height = -20;//-1*this.svgAfter.getBoundingClientRect().height;
-
-    var svgBefore = d3.select(this.svgBefore)
-      .attr('viewBox',  width + ' ' + height + ' 2000 2000')
-      .append("g");
-
-    var svgAfter = d3.select(this.svgAfter)
-      .attr('viewBox',  width + ' ' + height + ' 2000 1000')
-      .append("g");
-
-    var i = 0,
-      duration = 750,
-      rootBefore,
-      rootAfter;
-
-
-// Assigns parent, children, height, depth
-    rootBefore = d3.hierarchy(beforeData, function(d) { return d.children; });
-    // rootBefore.x0 = width;
-    // rootBefore.y0 = 0;
-
-    rootAfter = d3.hierarchy(afterData, function(d) { return d.children; });
-    rootAfter.x0 = width;
-    rootAfter.y0 = 0;
-
-
-// Collapse after the second level
-    //root.children.forEach(collapse);
-
-    update(svgBefore, rootBefore, rootBefore);
-    update(svgAfter, rootAfter, rootAfter);
-
-// Collapse the node and all it's children
-    function collapse(d) {
-      if(d.children) {
-        d._children = d.children
-        d._children.forEach(collapse)
-        d.children = null
+  createEdge(source, target, prefix = '') {
+    return {
+      data: {
+        id: prefix + 'edge' + source + target,
+        source: prefix + 'node' + source,
+        target: prefix + 'node' + target
       }
     }
+  }
 
-    function update(svg, root, source) {
-      // declares a tree layout and assigns the size
-      //var treemap = d3.tree().size([1000, width]);
-      var treemap = d3.tree().size([1000, 500]);
-
-      // Assigns the x and y position for the nodes
-      var treeData = treemap(root);
-
-      // Compute the new tree layout.
-      var nodes = treeData.descendants(),
-        links = treeData.descendants().slice(1);
-
-      // Normalize for fixed-depth.
-      nodes.forEach(function(d){ d.y = d.depth * 180});
-
-      // ****************** Nodes section ***************************
-
-      // Update the nodes...
-      var node = svg.selectAll('g.node')
-        .data(nodes, function(d) {return d.id || (d.id = ++i); });
-
-      source.x0 = source.x0 || 0;
-      source.y0 = source.y0 || 0;
-      // Enter any new modes at the parent's previous position.
-      var nodeEnter = node.enter().append('g')
-        .attr('class', 'node')
-        .attr("transform", function(d) {
-          return "translate(" + source.y0 + "," + source.x0 + ")";
-        })
-        .on('click', click);
-
-      // Add Circle for the nodes
-      nodeEnter.append('circle')
-        .attr('class', 'node')
-        .attr('r', 1e-6)
-        .style("fill", function(d) {
-          return d._children ? "lightsteelblue" : "#fff";
-        });
-
-      // Add labels for the nodes
-      nodeEnter.append('text')
-        .attr("dy", ".35em")
-        .attr("x", function(d) {
-          return d.children || d._children ? -13 : 13;
-        })
-        .attr("text-anchor", function(d) {
-          return d.children || d._children ? "end" : "start";
-        })
-        .text(function(d) { return d.data.name; });
-
-      // UPDATE
-      var nodeUpdate = nodeEnter.merge(node);
-
-      // Transition to the proper position for the node
-      nodeUpdate.transition()
-        .duration(duration)
-        .attr("transform", function(d) {
-          return "translate(" + d.x + "," + d.y + ")";
-        });
-
-      // Update the node attributes and style
-      nodeUpdate.select('circle.node')
-        .attr('r', 10)
-        .style("fill", function(d) {
-          return d._children ? "lightsteelblue" : "#fff";
-        })
-        .attr('cursor', 'pointer');
-
-
-      // Remove any exiting nodes
-      var nodeExit = node.exit().transition()
-        .duration(duration)
-        .attr("transform", function(d) {
-          return "translate(" + source.y + "," + source.x + ")";
-        })
-        .remove();
-
-      // On exit reduce the node circles size to 0
-      nodeExit.select('circle')
-        .attr('r', 1e-6);
-
-      // On exit reduce the opacity of text labels
-      nodeExit.select('text')
-        .style('fill-opacity', 1e-6);
-
-      // ****************** links section ***************************
-
-      // Update the links...
-      var link = svg.selectAll('path.link')
-        .data(links, function(d) { return d.id; });
-
-      // Enter any new links at the parent's previous position.
-      var linkEnter = link.enter().insert('path', "g")
-        .attr("class", "link")
-        .attr('d', function(d){
-          var o = {x: source.x0, y: source.y0}
-          return diagonal(o, o)
-        });
-
-      // UPDATE
-      var linkUpdate = linkEnter.merge(link);
-
-      // Transition back to the parent element position
-      linkUpdate.transition()
-        .duration(duration)
-        .attr('d', function(d){ return diagonal(d, d.parent) });
-
-      // Remove any exiting links
-      var linkExit = link.exit().transition()
-        .duration(duration)
-        .attr('d', function(d) {
-          var o = {x: source.x, y: source.y}
-          return diagonal(o, o)
-        })
-        .remove();
-
-      // Store the old positions for transition.
-      nodes.forEach(function(d){
-        d.x0 = d.x;
-        d.y0 = d.y;
-      });
-
-      // Creates a curved (diagonal) path from parent to the child nodes
-      function diagonal(s, d) {
-
-        let path = `M ${s.x} ${s.y}
-            C ${(s.x + d.x) / 2} ${s.y},
-              ${(s.x + d.x) / 2} ${d.y},
-              ${d.x} ${d.y}`
-
-        return path
+  listToObj(list, prefix) {
+    let result = [];
+    if(!list){
+      return result;
+    }
+    let current = null;
+    for(let i = 0; i < list.length; i++) {
+      let node = this.createNode(i, list[i]);
+      result.push(node);
+      if(2*i+1 < list.length) {
+        let edge = this.createEdge(i, 2*i+1);
+        result.push(edge);
       }
-
-      // Toggle children on click.
-      function click(d) {
-        if (d.children) {
-          d._children = d.children;
-          d.children = null;
-        } else {
-          d.children = d._children;
-          d._children = null;
-        }
-        update(svg, root, d);
+      if(2*i+2 < list.length) {
+        let edge = this.createEdge(i, 2*i+2);
+        result.push(edge);
       }
     }
+    return result;
+  }
+
+  drawChart(id, data) {
+    var options = {
+      name: 'dagre',
+      // dagre algo options, uses default value on undefined
+      nodeSep: undefined, // the separation between adjacent nodes in the same rank
+      edgeSep: undefined, // the separation between adjacent edges in the same rank
+      rankSep: undefined, // the separation between adjacent nodes in the same rank
+      rankDir: undefined, // 'TB' for top to bottom flow, 'LR' for left to right
+      minLen: function( edge ){ return 1; }, // number of ranks to keep between the source and target of the edge
+      edgeWeight: function( edge ){ return 1; }, // higher weight edges are generally made shorter and straighter than lower weight edges
+
+      // general layout options
+      fit: true, // whether to fit to viewport
+      padding: 30, // fit padding
+      animate: false, // whether to transition the node positions
+      animationDuration: 500, // duration of animation in ms if enabled
+      animationEasing: undefined, // easing of animation if enabled
+      boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+      ready: function(){}, // on layoutready
+      stop: function(){} // on layoutstop
+    };
+    var cy = cytoscape({
+      container: document.getElementById(id),
+      elements: data,
+      layout: options,
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'background-color': 'red',
+            label: 'data(value)'
+          }
+        }]
+
+    });
   }
 
   render() {
     return (
-      <div>
-        <div className='svg-container'>
-          <svg className='svg-content-responsive' preserveAspectRatio='xMinYMin meet' ref={(elem) => { this.svgBefore = elem; }}>
-          </svg>
+      <div className="heapContainer">
+        <div id='beforeHeap' className='heap'>
         </div>
-        <div className='svg-container'>
-          <svg className='svg-content-responsive' preserveAspectRatio='xMinYMin meet' ref={(elem) => { this.svgAfter = elem; }}>
-          </svg>
+        <div id='afterHeap' className='heap'>
         </div>
       </div>
     );
