@@ -22,11 +22,14 @@ class Heap {
    */
   heapify() {
     let list = this.list;
-    let end = list.length -1;
-    while(end >= 0) {
-      this.swap(0, end);
-      this.siftDown(0);
-      end--;
+    // let end = list.length -1;
+    // while(end >= 0) {
+    //   this.swap(0, end);
+    //   this.siftDown(0);
+    //   end--;
+    // }
+    for(let i = 1; i < list.length; i++) {
+      this.siftUp(0, i);
     }
   }
 
@@ -36,7 +39,7 @@ class Heap {
   push(item) {
     let list = this.list;
     list.push(item);
-    this.siftUp(this.size() - 1);
+    this.siftUp(0, this.size() - 1);
   }
 
   /**
@@ -86,10 +89,10 @@ class Heap {
     list[j] = temp;
   }
 
-  siftUp(index) {
-    let current = index;
+  siftUp(start, end) {
+    let current = end;
     let list = this.list;
-    while(current > 0) {
+    while(current > start) {
       let parent = Math.floor((current-1)/2);
       // perform swap based on results of compareTo
       if(this.compareTo(list[parent], list[current]) < 0) {

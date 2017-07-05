@@ -46,48 +46,45 @@ class Heapd3 extends React.Component {
   }
 
   drawChart() {
-    var beforeList = [6, 5, 3, 2, 1, 4];
+    var beforeList = [6, 5, 3, 2, 1, 4,5,5,5,5,5,5,4,6,6,2,3,36,35,2,21,5,8,74,5,4,9,0,8,8,6,7];
     var beforeData = this.listToObj(beforeList);
     var heap = new Heap(beforeList);
     var afterData = this.listToObj(heap.list);
+    console.log(heap.list);
+console.log(afterData);
 
 // Set the dimensions and margins of the diagram
-    var margin = {top: 20, right: 90, bottom: 30, left: 90},
-      width = 960 - margin.left - margin.right,
-      height = 500 - margin.top - margin.bottom;
+//     var margin = {top: 20, right: 90, bottom: 30, left: 90},
+//       width = 960 - margin.left - margin.right,
+//       height = 500 - margin.top - margin.bottom;
 
 // append the svg object to the body of the page
 // appends a 'group' element to 'svg'
 // moves the 'group' element to the top left margin
+    var width = (d3.select('.svg-container').node().getBoundingClientRect().width) / -4;
+    var height = -20;//-1*this.svgAfter.getBoundingClientRect().height;
+
     var svgBefore = d3.select(this.svgBefore)
-      .attr("width", width + margin.right + margin.left)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", "translate("
-        + margin.left + "," + margin.top + ")");
+      .attr('viewBox',  width + ' ' + height + ' 2000 2000')
+      .append("g");
 
     var svgAfter = d3.select(this.svgAfter)
-      .attr("width", width + margin.right + margin.left)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", "translate("
-        + margin.left + "," + margin.top + ")");
+      .attr('viewBox',  width + ' ' + height + ' 2000 1000')
+      .append("g");
 
     var i = 0,
       duration = 750,
       rootBefore,
       rootAfter;
 
-// declares a tree layout and assigns the size
-    var treemap = d3.tree().size([height, width]);
 
 // Assigns parent, children, height, depth
     rootBefore = d3.hierarchy(beforeData, function(d) { return d.children; });
-    rootBefore.x0 = height / 2;
-    rootBefore.y0 = 0;
+    // rootBefore.x0 = width;
+    // rootBefore.y0 = 0;
 
     rootAfter = d3.hierarchy(afterData, function(d) { return d.children; });
-    rootAfter.x0 = height / 2;
+    rootAfter.x0 = width;
     rootAfter.y0 = 0;
 
 
@@ -107,6 +104,9 @@ class Heapd3 extends React.Component {
     }
 
     function update(svg, root, source) {
+      // declares a tree layout and assigns the size
+      //var treemap = d3.tree().size([1000, width]);
+      var treemap = d3.tree().size([1000, 500]);
 
       // Assigns the x and y position for the nodes
       var treeData = treemap(root);
@@ -124,6 +124,8 @@ class Heapd3 extends React.Component {
       var node = svg.selectAll('g.node')
         .data(nodes, function(d) {return d.id || (d.id = ++i); });
 
+      source.x0 = source.x0 || 0;
+      source.y0 = source.y0 || 0;
       // Enter any new modes at the parent's previous position.
       var nodeEnter = node.enter().append('g')
         .attr('class', 'node')
@@ -251,10 +253,14 @@ class Heapd3 extends React.Component {
   render() {
     return (
       <div>
-        <svg ref={(elem) => { this.svgBefore = elem; }}>
-        </svg>
-        <svg ref={(elem) => { this.svgAfter = elem; }}>
-        </svg>
+        <div className='svg-container'>
+          <svg className='svg-content-responsive' preserveAspectRatio='xMinYMin meet' ref={(elem) => { this.svgBefore = elem; }}>
+          </svg>
+        </div>
+        <div className='svg-container'>
+          <svg className='svg-content-responsive' preserveAspectRatio='xMinYMin meet' ref={(elem) => { this.svgAfter = elem; }}>
+          </svg>
+        </div>
       </div>
     );
   }
