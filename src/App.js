@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
-import Heapd3 from './visual/heapd3'
+// import Heapd3 from './visual/heapd3'
 import './App.css';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import MyAwesomeReactComponent from './page/main/main.js';
@@ -16,13 +16,12 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Heapd3 />
-        <MuiThemeProvider>
-          <AppBar
-            title="Happy App"
-            iconClassNameRight="muidocs-icon-navigation-expand-more"
-          />
-        </MuiThemeProvider>
+        {/*<MuiThemeProvider>*/}
+          {/*<AppBar*/}
+            {/*title="Happy App"*/}
+            {/*iconClassNameRight="muidocs-icon-navigation-expand-more"*/}
+          {/*/>*/}
+        {/*</MuiThemeProvider>*/}
         <MuiThemeProvider>
           <HeapTabComponent />
         </MuiThemeProvider>

@@ -39,24 +39,22 @@ class TabTemplate extends React.Component {
 export default class HeapTabComponent extends React.Component {
   get styles() {
     return {
-      root: {
-        flex: '1 1 100%',
-        minHeight: 0,
-        display: 'flex',
-        flexDirection: 'column'
-      },
-      container: {
-        flex: '1 1 100%',
-        display: 'flex',
-        flexDirection: 'column',
-        overflowY: 'auto'
-      },
       paper: {
         margin: '20px 20px 20px 20px',
-        flex: '1 1 100%',
-        display: 'flex',
-        flexDirection: 'column',
-        overflowY: 'auto'
+        height: '95%'
+      },
+      card: {
+        height: '100%'
+      },
+      tabTemplate: {
+        height: '100%'
+      },
+      tabContainer: {
+        //height: '1000px',
+        //position: 'absolute',
+        height: '100%',
+        width: 'auto',
+        'background-color': 'blue'
       }
     };
   }
@@ -77,28 +75,24 @@ export default class HeapTabComponent extends React.Component {
   render() {
     return (
       <Paper zDepth={2} style={this.styles.paper} >
-        <card>
-          <CardTitle title="Heap Visualization" subtitle="Visualize list before and after list was heapified" />
+        <card style={this.styles.card}>
+          <CardTitle title='Heap Visualization' subtitle='Visualize list before and after list was heapified' />
           <CardText>
             <TextField
-              defaultValue="6, 5, 3, 2, 1, 4,5,5,5,5,5,5,4,6,6,2,3,36,35,2,21,5,8,74,5,4,9,0,8,8,6,7"
-              floatingLabelText="List used to construct heap"
+              defaultValue='6, 5, 3, 2, 1, 4,5,5,5,5,5,5,4,6,6,2,3,36,35,2,21,5,8,74,5,4,9,0,8,8,6,7'
+              floatingLabelText='List used to construct heap'
             />
             <Tabs
               value={this.state.value}
               onChange={this.handleChange}
-              style={this.styles.root}
-              contentContainerStyle={this.styles.container}
+              tabItemContainerStyle={this.styles.tabTemplate} // tab label
+              contentContainerStyle={this.styles.tabContainer} // this controls style of items owned by tab
+              tabTemplateStyle={this.styles.tabTemplate} // tab template style
             >
-              <Tab label="Before" value="a">
-                <p>
-                  This is another example of a controllable tab. Remember, if you
-                  use controllable Tabs, you need to give all of your tabs values or else
-                  you wont be able to select them.
-                </p>
+              <Tab label='Before' value='a' style='{{height: "100%" }}'>
                 <Heapd3 />
               </Tab>
-              <Tab label="After" value="b">
+              <Tab label='After' value='b'>
                 <div>
                   <h2>After</h2>
                   <p>

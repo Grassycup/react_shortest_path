@@ -18,6 +18,11 @@
   font-size: large;
 }
 
+html, body, #app, #app>div, #root, .App {
+  height: 100%;
+}
+
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
