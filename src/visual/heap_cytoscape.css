@@ -1,0 +1,39 @@
+.node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 3px;
+}
+
+.node text {
+    font: 12px sans-serif;
+}
+
+.link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 2px;
+}
+
+.heap {
+    height: 100%;
+    /*flex-grow: 1;*/
+}
+
+#heap {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.heapContainer {
+    width: 100% !important;
+    height: 90% !important;
+    position: absolute; /* cytoscape uses absolute positioning for canvas so this is required */
+}
+
+.heapContainer canvas {
+    width: 90% !important;
+    height: 85% !important;;
+    right: 5%;
+    top: 0%;
+
+}

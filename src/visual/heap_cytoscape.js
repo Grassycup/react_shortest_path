@@ -1,24 +1,27 @@
 import React, { Component } from 'react';
-import './heapd3.css';
+import './heap_cytoscape.css';
 import Heap from '../data_structure/heap.js';
 import cytoscape from 'cytoscape';
 import dagre from 'cytoscape-dagre';
 dagre(cytoscape);
 
-class Heapd3 extends React.Component {
+class HeapCytoscape extends React.Component {
   componentDidMount() {
-    var beforeList = [6, 5, 3, 2, 1, 4,5,5,5,5,5,5,4,6,6,2,3,36,35,2,21,5,8,74,5,4,9,0,8,8,6,7];
-    var beforeData = this.listToObj(beforeList, 'a');
-    var heap = new Heap(beforeList);
+    this.drawNodes();
+  }
+
+  componentDidUpdate() {
+    this.drawNodes();
+  }
+
+  drawNodes() {
+    var list = this.props.value.split(',');
+    var heap = new Heap(list);
     var afterData = this.listToObj(heap.list, 'b');
 
-    this.drawChart('beforeHeap', beforeData);
-    this.drawChart('afterHeap', afterData);
+    this.initializeCytoscape('heap', afterData);
   }
 
-  shouldComponentUpdate() {
-    return false;
-  }
 
   createNode(id, value, prefix = '') {
     return {
@@ -60,7 +63,7 @@ class Heapd3 extends React.Component {
     return result;
   }
 
-  drawChart(id, data) {
+  initializeCytoscape(id, data) {
     var options = {
       name: 'dagre',
       // dagre algo options, uses default value on undefined
@@ -100,9 +103,7 @@ class Heapd3 extends React.Component {
   render() {
     return (
       <div className="heapContainer">
-        <div id='beforeHeap' className='heap'>
-        </div>
-        <div id='afterHeap' className='heap'>
+        <div id='heap' className='heap'>
         </div>
       </div>
     );
@@ -110,4 +111,4 @@ class Heapd3 extends React.Component {
 
 }
 
-export default Heapd3;
+export default HeapCytoscape;
